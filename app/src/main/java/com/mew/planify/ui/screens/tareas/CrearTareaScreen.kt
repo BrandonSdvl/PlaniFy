@@ -67,13 +67,7 @@ fun CrearTareaScreen(
 
     val tarea by viewModel.tarea.collectAsState()
 
-    var materiaExpanded by remember { mutableStateOf(false) } // Estado para controlar el menú desplegable
     val materiaOptions = listOf("Materia 1", "Materia 2", "Materia3")
-
-    var prioridadExpanded by remember { mutableStateOf(false) } // Estado para controlar el menú desplegable
-    val prioridadOptions = listOf("Baja", "Media", "Alta")
-
-    var estatusExpanded by remember { mutableStateOf(false) } // Estado para controlar el menú desplegable
     val estatusOptions = listOf("Pendiente", "En progreso", "Finalizada")
 
     val context = LocalContext.current

@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-//        applicationContext.deleteDatabase("app_database")
+//        applicationContext.deleteDatabase("planifydb")
         val db = AppDatabase.getDatabase(applicationContext)
 
         setContent {

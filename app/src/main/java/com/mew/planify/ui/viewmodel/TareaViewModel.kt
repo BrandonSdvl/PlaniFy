@@ -218,13 +218,15 @@ class TareaViewModel(
             errorFechaEntrega = validarFechaEntrega(nuevaFechaEntrega)
         )
     }
+
+    data class FormState(
+        val errorIdMateria: String? = null,
+        val errorTitulo: String? = null,
+        val errorDescripcion: String? = null,
+        val errorEstatus: String? = null,
+        val errorPrioridad: String? = null,
+        val errorFechaEntrega: String? = null
+    )
+
 }
 
-data class FormState(
-    val errorIdMateria: String? = null,
-    val errorTitulo: String? = null,
-    val errorDescripcion: String? = null,
-    val errorEstatus: String? = null,
-    val errorPrioridad: String? = null,
-    val errorFechaEntrega: String? = null
-)
