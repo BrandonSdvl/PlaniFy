@@ -9,12 +9,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mew.planify.data.local.AppDatabase
+import com.mew.planify.data.repository.MateriaRepository
 import com.mew.planify.data.repository.ProfesorRepository
 import com.mew.planify.data.repository.TareaRepository
+import com.mew.planify.ui.screens.materias.CrearMateriaScreen
+import com.mew.planify.ui.screens.materias.MostrarMateriasScreen
 import com.mew.planify.ui.screens.profesores.CrearProfesorScreen
 import com.mew.planify.ui.screens.profesores.MostrarProfesoresScreen
 import com.mew.planify.ui.screens.tareas.MostrarTareasScreen
 import com.mew.planify.ui.screens.tareas.CrearTareaScreen
+import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.ProfesorViewModel
 import com.mew.planify.ui.viewmodel.TareaViewModel
 
@@ -32,7 +36,11 @@ fun AppNavigation(db: AppDatabase) {
     val profesorRepository = ProfesorRepository(profesorDao)
     val profesorViewModel = ProfesorViewModel(profesorRepository)
 
-    NavHost(navController = navController, startDestination = "mostrar_tareas") {
+    val materiaDao = db.materiaDao()
+    val materiaRepository = MateriaRepository(materiaDao)
+    val materiaViewModel = MateriaViewModel(materiaRepository)
+
+    NavHost(navController = navController, startDestination = "mostrar_materias") {
         composable("crear_tarea") {
             CrearTareaScreen(
                 onBack = {
@@ -95,6 +103,37 @@ fun AppNavigation(db: AppDatabase) {
                 onBack = { navController.popBackStack() },
                 viewModel = profesorViewModel,
                 profesorId = profesorId
+            )
+        }
+
+        composable("mostrar_materias") {
+            MostrarMateriasScreen(
+                onCrearMateriaClick = { navController.navigate("crear_materia") },
+                onMateriaClick = { materiaId ->
+                    navController.navigate("detalle_materia/$materiaId")
+                },
+                materiaViewModel = materiaViewModel,
+                profesorViewModel = profesorViewModel
+            )
+        }
+
+        composable("crear_materia") {
+            CrearMateriaScreen(
+                onBack = { navController.popBackStack() },
+                materiaViewModel = materiaViewModel,
+                profesorViewModel = profesorViewModel
+            )
+        }
+
+        composable(
+            route = "detalle_materia/{materiaId}",
+            arguments = listOf(navArgument("materiaId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            CrearMateriaScreen(
+                onBack = { navController.popBackStack() },
+                materiaViewModel = materiaViewModel,
+                profesorViewModel = profesorViewModel,
+                idMateria = backStackEntry.arguments?.getInt("materiaId") ?: 0
             )
         }
     }
