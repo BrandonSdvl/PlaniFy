@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProfesorDao {
     @Query("SELECT * FROM profesores")
-    fun obtenerProfesores(): Flow<List<ProfesorEntity>>
+    fun getAll(): Flow<List<ProfesorEntity>>
 
     @Upsert
-    suspend fun upsert(profesor: ProfesorEntity)
+    suspend fun insertOrUpdate(profesor: ProfesorEntity)
 
     @Delete
     suspend fun delete(profesor: ProfesorEntity)
 
     @Query("SELECT * FROM profesores WHERE id = :profesorId")
-    fun obtenerProfesorPorId(profesorId: Int): Flow<ProfesorEntity?>
+    fun findById(profesorId: Int): Flow<ProfesorEntity?>
 
 }

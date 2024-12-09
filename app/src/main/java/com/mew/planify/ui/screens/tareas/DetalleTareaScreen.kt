@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mew.planify.ui.viewmodel.TareaViewModel
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -29,7 +28,7 @@ fun DetalleTareaScreen(
     onBack: () -> Unit,
     viewModel: TareaViewModel
 ) {
-    val tarea by viewModel.obtenerTareaPorId(tareaId).collectAsState(initial = null)
+    val tarea by viewModel.findById(tareaId).collectAsState(initial = null)
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     Scaffold(

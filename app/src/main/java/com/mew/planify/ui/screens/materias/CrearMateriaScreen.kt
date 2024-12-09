@@ -32,7 +32,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mew.planify.data.local.entities.ProfesorEntity
 import com.mew.planify.ui.common.ConfirmDialog
-import com.mew.planify.ui.common.DropdownField
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.ProfesorViewModel
@@ -123,7 +122,7 @@ fun CrearMateriaScreen (
                     onExpandedChange = { expanded.value = !expanded.value }
                 ) {
                     OutlinedTextField(
-                        value = (if (materia.idProfesor == null) "Sin asignar" else profesorViewModel.obtenerProfesorPorId(materia.idProfesor!!).collectAsState(null).value?.nombre) ?: "Sin asignar",
+                        value = (if (materia.idProfesor == null) "Sin asignar" else profesorViewModel.findById(materia.idProfesor!!).collectAsState(null).value?.nombre) ?: "Sin asignar",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Profesor") },

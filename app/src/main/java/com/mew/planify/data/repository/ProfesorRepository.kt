@@ -6,19 +6,19 @@ import kotlinx.coroutines.flow.Flow
 
 class ProfesorRepository(private val profesorDao: ProfesorDao) {
 
-    suspend fun insertProfesor(profesor: ProfesorEntity) {
-        profesorDao.upsert(profesor)
+    suspend fun insertOrUpdate(profesor: ProfesorEntity) {
+        profesorDao.insertOrUpdate(profesor)
     }
 
-    fun obtenerProfesores(): Flow<List<ProfesorEntity>> {
-        return profesorDao.obtenerProfesores()
+    fun getAll(): Flow<List<ProfesorEntity>> {
+        return profesorDao.getAll()
     }
 
-    fun obtenerProfesorPorId(profesorId: Int): Flow<ProfesorEntity?> {
-        return profesorDao.obtenerProfesorPorId(profesorId)
+    fun findById(profesorId: Int): Flow<ProfesorEntity?> {
+        return profesorDao.findById(profesorId)
     }
 
-    suspend fun eliminarProfesor(profesor: ProfesorEntity) {
+    suspend fun delete(profesor: ProfesorEntity) {
         profesorDao.delete(profesor)
     }
 }

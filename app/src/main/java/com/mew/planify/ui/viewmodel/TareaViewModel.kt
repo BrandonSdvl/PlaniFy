@@ -1,7 +1,6 @@
 package com.mew.planify.ui.viewmodel
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,19 +36,19 @@ class TareaViewModel(
     val tarea: StateFlow<TareaEntity> = _tarea
 
     init {
-        obtenerTareas()
+        getAll()
     }
 
-    fun limipiarTarea() {
+    fun clean() {
         _tarea.value = TareaEntity() // Limpiar el formulario después de guardar
     }
 
-    private fun obtenerTareas() {
+    private fun getAll() {
         viewModelScope.launch {
             _loading.value = true // Mostrar indicador de carga
             delay(3000)
             try {
-                repository.obtenerTodasLasTareas()
+                repository.getAll()
                     .stateIn(
                         scope = viewModelScope,
                         started = SharingStarted.Lazily,
@@ -66,13 +65,13 @@ class TareaViewModel(
         }
     }
 
-    fun guardarTarea(): Boolean {
-        if (validarTarea(tarea.value)) {
+    fun insertOrUpdate(): Boolean {
+        if (validateTarea(tarea.value)) {
             viewModelScope.launch {
                 try {
-                    repository.insertTarea(tarea.value)
-                    limipiarTarea()
-                    obtenerTareas() // Actualizar la lista después de guardar
+                    repository.insertOrUpdate(tarea.value)
+                    clean()
+                    getAll() // Actualizar la lista después de guardar
                 } catch (e: Exception) {
                     _error.value = e.message
                 }
@@ -83,12 +82,12 @@ class TareaViewModel(
         }
     }
 
-    fun eliminarTarea(tareaId: Int) {
+    fun delete(tareaId: Int) {
         viewModelScope.launch {
             try {
-                val tarea = repository.obtenerTareaPorId(tareaId).firstOrNull()
+                val tarea = repository.findById(tareaId).firstOrNull()
                 tarea?.let {
-                    repository.eliminarTarea(it)
+                    repository.delete(it)
                 }
             } catch (e: Exception) {
                 _error.value = e.message
@@ -96,12 +95,12 @@ class TareaViewModel(
         }
     }
 
-    fun obtenerTareaPorId(id: Int): Flow<TareaEntity?> {
+    fun findById(id: Int): Flow<TareaEntity?> {
         if (id < 0) {
             _error.value = "El ID de la tarea no es válido."
             return flowOf(null) // Flujo vacío
         }
-        return repository.obtenerTareaPorId(id)
+        return repository.findById(id)
     }
 
     fun setTarea(tarea: TareaEntity) {
@@ -111,7 +110,7 @@ class TareaViewModel(
 
 
 //    VALIDACIONES
-    private fun validarTarea(tarea: TareaEntity): Boolean {
+    private fun validateTarea(tarea: TareaEntity): Boolean {
         onIdMateriaChange(tarea.idMateria)
         onTituloChange(tarea.titulo)
         onDescripcionChange(tarea.descripcion)
@@ -127,14 +126,14 @@ class TareaViewModel(
                 formState.value.errorFechaEntrega == null
     }
 
-    private fun validarIdMateria(idMateria: Int?): String? {
+    private fun validateIdMateria(idMateria: Int?): String? {
         return when {
             idMateria == null -> "Seleccione una materia"
             else -> null
         }
     }
 
-    private fun validarTitulo(titulo: String): String? {
+    private fun validateTitulo(titulo: String): String? {
         return when {
             titulo.isBlank() -> "El título no puede estar vacío"
             titulo.length > 50 -> "El título no puede tener más de 50 caracteres"
@@ -142,7 +141,7 @@ class TareaViewModel(
         }
     }
 
-    private fun validarDescripcion(descripcion: String): String? {
+    private fun validateDescripcion(descripcion: String): String? {
         return when {
             descripcion.isBlank() -> "La descripción no puede estar vacía"
             descripcion.length > 400 -> "La descripción no puede superar los 200 caracteres"
@@ -150,15 +149,15 @@ class TareaViewModel(
         }
     }
 
-    private fun validarEstatus(estatus: String): String? {
+    private fun validateEstatus(estatus: String): String? {
         return if (estatus.isBlank()) "Seleccione una opción" else null
     }
 
-    private fun validarPrioridad(prioridad: String): String? {
+    private fun validatePrioridad(prioridad: String): String? {
         return if (prioridad.isBlank()) "Seleccione una opción" else null
     }
 
-    private fun validarFechaEntrega(fechaEntrega: Date?): String? {
+    private fun validateFechaEntrega(fechaEntrega: Date?): String? {
         return if (fechaEntrega == null) "La fecha de entrega no puede estar vacía" else null
     }
 
@@ -168,7 +167,7 @@ class TareaViewModel(
         )
 
         _formState.value = _formState.value.copy(
-            errorIdMateria = validarIdMateria(nuevoIdMateria)
+            errorIdMateria = validateIdMateria(nuevoIdMateria)
         )
     }
 
@@ -178,7 +177,7 @@ class TareaViewModel(
         )
 
         _formState.value = _formState.value.copy(
-            errorTitulo = validarTitulo(nuevoTitulo)
+            errorTitulo = validateTitulo(nuevoTitulo)
         )
     }
 
@@ -188,7 +187,7 @@ class TareaViewModel(
         )
 
         _formState.value = _formState.value.copy(
-            errorDescripcion = validarDescripcion(nuevaDescripcion)
+            errorDescripcion = validateDescripcion(nuevaDescripcion)
         )
     }
 
@@ -197,7 +196,7 @@ class TareaViewModel(
 
         // Validar el campo de estatus
         _formState.value = _formState.value.copy(
-            errorEstatus = validarEstatus(nuevoEstatus)
+            errorEstatus = validateEstatus(nuevoEstatus)
         )
     }
 
@@ -206,7 +205,7 @@ class TareaViewModel(
 
         // Validar el campo de prioridad
         _formState.value = _formState.value.copy(
-            errorPrioridad = validarPrioridad(nuevaPrioridad)
+            errorPrioridad = validatePrioridad(nuevaPrioridad)
         )
     }
 
@@ -215,7 +214,7 @@ class TareaViewModel(
 
         // Validar el campo de fecha límite
         _formState.value = _formState.value.copy(
-            errorFechaEntrega = validarFechaEntrega(nuevaFechaEntrega)
+            errorFechaEntrega = validateFechaEntrega(nuevaFechaEntrega)
         )
     }
 

@@ -44,7 +44,7 @@ fun CrearProfesorScreen(
 
     LaunchedEffect(profesorId) {
         if (profesorId != null) {
-            val tarea = viewModel.obtenerProfesorPorId(profesorId).firstOrNull()
+            val tarea = viewModel.findById(profesorId).firstOrNull()
             tarea?.let { viewModel.setProfesor(it) }
         }
     }
@@ -135,7 +135,7 @@ fun CrearProfesorScreen(
                     }
                     Button(
                         onClick = {
-                            if (viewModel.guardarProfesor()) onBack()
+                            if (viewModel.insertOrUpdate()) onBack()
                         }
                     ) {
                         Text(if (profesorId != null) "Guardar cambios" else "Crear profesor")
@@ -147,7 +147,7 @@ fun CrearProfesorScreen(
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
                         showDialog = false
-                        viewModel.limipiarProfesor()
+                        viewModel.clean()
                         onBack()
                     },
                     onDismiss = { showDialog = false },
@@ -159,7 +159,7 @@ fun CrearProfesorScreen(
                     title = "Confirmar eliminación",
                     message = "¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.",
                     onConfirm = {
-                        profesorId?.let(viewModel::eliminarProfesor)
+                        profesorId?.let(viewModel::delete)
                         showDeleteDialog = false
                         onBack()
                     },

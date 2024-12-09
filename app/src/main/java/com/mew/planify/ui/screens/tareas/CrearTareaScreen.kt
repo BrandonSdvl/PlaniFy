@@ -60,7 +60,7 @@ fun CrearTareaScreen(
 
     LaunchedEffect(tareaId) {
         if (tareaId != null) {
-            val tarea = viewModel.obtenerTareaPorId(tareaId).firstOrNull()
+            val tarea = viewModel.findById(tareaId).firstOrNull()
             tarea?.let { viewModel.setTarea(it) }
         }
     }
@@ -210,7 +210,7 @@ fun CrearTareaScreen(
                     }
                     Button(
                         onClick = {
-                            if (viewModel.guardarTarea()) onBack()
+                            if (viewModel.insertOrUpdate()) onBack()
                         }
                     ) {
                         Text(if (tareaId != null) "Guardar cambios" else "Crear tarea")
@@ -222,7 +222,7 @@ fun CrearTareaScreen(
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
                         showDialog = false
-                        viewModel.limipiarTarea()
+                        viewModel.clean()
                         onBack()
                     },
                     onDismiss = { showDialog = false },
@@ -234,7 +234,7 @@ fun CrearTareaScreen(
                     title = "Confirmar eliminación",
                     message = "¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.",
                     onConfirm = {
-                        tareaId?.let(viewModel::eliminarTarea)
+                        tareaId?.let(viewModel::delete)
                         showDeleteDialog = false
                         onBack()
                     },

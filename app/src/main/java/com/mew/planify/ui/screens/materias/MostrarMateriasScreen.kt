@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mew.planify.data.local.entities.MateriaEntity
 import com.mew.planify.ui.common.LoadingIndicator
 import com.mew.planify.ui.viewmodel.MateriaViewModel
@@ -74,7 +73,7 @@ fun MostrarMateriasScreen(
                         MateriaItem(
                             materia = materia,
                             onClick = { onMateriaClick(materia.id) },
-                            profesor = if (materia.idProfesor != null) profesorViewModel.obtenerProfesorPorId(materia.idProfesor).collectAsState(null).value?.nombre ?: "Sin asignar" else "Sin asignar"
+                            profesor = if (materia.idProfesor != null) profesorViewModel.findById(materia.idProfesor).collectAsState(null).value?.nombre ?: "Sin asignar" else "Sin asignar"
                         )
                         HorizontalDivider()
                     }

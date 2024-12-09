@@ -5,23 +5,19 @@ import com.mew.planify.data.local.entities.TareaEntity
 import kotlinx.coroutines.flow.Flow
 
 class TareaRepository(private val tareaDao: TareaDao) {
-    fun obtenerTareasPorMateria(idMateria: Int): Flow<List<TareaEntity>> {
-        return tareaDao.obtenerTareasPorMateria(idMateria)
+    suspend fun insertOrUpdate(tarea: TareaEntity) {
+        tareaDao.insertOrUpdate(tarea)
     }
 
-    suspend fun insertTarea(tarea: TareaEntity) {
-        tareaDao.upsert(tarea)
+    fun getAll(): Flow<List<TareaEntity>> {
+        return tareaDao.getAll()
     }
 
-    fun obtenerTodasLasTareas(): Flow<List<TareaEntity>> {
-        return tareaDao.obtenerTodasLasTareas()
+    fun findById(id: Int): Flow<TareaEntity?> {
+        return tareaDao.findById(id)
     }
 
-    fun obtenerTareaPorId(id: Int): Flow<TareaEntity?> {
-        return tareaDao.obtenerTareaPorId(id)
-    }
-
-    suspend fun eliminarTarea(tarea: TareaEntity) {
+    suspend fun delete(tarea: TareaEntity) {
         tareaDao.delete(tarea)
     }
 }
