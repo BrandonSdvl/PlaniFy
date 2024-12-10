@@ -108,15 +108,6 @@ fun CrearMateriaScreen (
                     errorMessage = formState.errorNombre
                 )
 
-//                DropdownField(
-//                    label = "Profesor",
-//                    options = profesorOptions.map { it.nombre },
-//                    selectedValue = (if (materia.idProfesor == null) "Sin asignar" else profesorViewModel.obtenerProfesorPorId(materia.idProfesor!!).collectAsState(null).value?.nombre) ?: "Sin asignar",
-//                    onOptionSelected = { index, _ -> materiaViewModel.onIdProfesorChange(index) },
-//                    errorMessage = formState.errorIdProfesor
-//                )
-//
-
                 ExposedDropdownMenuBox(
                     expanded = expanded.value,
                     onExpandedChange = { expanded.value = !expanded.value }

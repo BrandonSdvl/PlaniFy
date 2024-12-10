@@ -17,7 +17,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -38,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.mew.planify.ui.common.ConfirmDialog
 import com.mew.planify.ui.common.DropdownField
 import com.mew.planify.ui.common.ValidatedTextField
+import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.TareaViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
@@ -50,29 +54,32 @@ import java.util.Calendar
 @Composable
 fun CrearTareaScreen(
     onBack: () -> Unit,
-    viewModel: TareaViewModel,
+    tareaViewModel: TareaViewModel,
+    materiaViewModel: MateriaViewModel,
     tareaId: Int? = null
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    val formState by viewModel.formState
+    val formState by tareaViewModel.formState
 
     LaunchedEffect(tareaId) {
         if (tareaId != null) {
-            val tarea = viewModel.findById(tareaId).firstOrNull()
-            tarea?.let { viewModel.setTarea(it) }
+            val tarea = tareaViewModel.findById(tareaId).firstOrNull()
+            tarea?.let { tareaViewModel.setTarea(it) }
         }
     }
 
-    val tarea by viewModel.tarea.collectAsState()
+    val tarea by tareaViewModel.tarea.collectAsState()
 
-    val materiaOptions = listOf("Materia 1", "Materia 2", "Materia3")
+    val materiasOptions = materiaViewModel.materias.collectAsState(emptyList()).value
     val estatusOptions = listOf("Pendiente", "En progreso", "Finalizada")
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    var expanded = remember { mutableStateOf(false) }
 
     calendar.add(Calendar.DAY_OF_MONTH, 1)
 
@@ -83,7 +90,7 @@ fun CrearTareaScreen(
             calendar.set(year, month, dayOfMonth)
             val selectedDate = calendar.time
 
-            viewModel.onFechaEntregaChange(selectedDate)
+            tareaViewModel.onFechaEntregaChange(selectedDate)
             Log.d("DatePicker", "Fecha seleccionada: $selectedDate")
         },
         calendar.get(Calendar.YEAR),
@@ -125,25 +132,56 @@ fun CrearTareaScreen(
             ){
                 Text(if (tareaId != null) "Editar tarea" else "Crear tarea")
 
-                DropdownField(
-                    label = "Materia",
-                    options = listOf("Materia 1", "Materia 2", "Materia 3"),
-                    selectedValue = if (tarea.idMateria == null) "Seleccione una opción" else materiaOptions[tarea.idMateria!!],
-                    onOptionSelected = { index, _ -> viewModel.onIdMateriaChange(index) },
-                    errorMessage = formState.errorIdMateria
-                )
+                ExposedDropdownMenuBox(
+                    expanded = expanded.value,
+                    onExpandedChange = { expanded.value = !expanded.value }
+                ) {
+                    OutlinedTextField(
+                        value = (if (tarea.idMateria == null) "Seleccione una opción" else materiaViewModel.findById(tarea.idMateria!!).collectAsState(null).value?.nombre) ?: "Seleccione una opción",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Materia") },
+                        isError = formState.errorIdMateria != null,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded.value) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded.value,
+                        onDismissRequest = { expanded.value = false }
+                    ) {
+                        materiasOptions.forEach { materia ->
+                            DropdownMenuItem(
+                                text = { Text(materia.nombre) },
+                                onClick = {
+                                    tareaViewModel.onIdMateriaChange(materia.id)
+                                    expanded.value = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (formState.errorIdMateria != null) {
+                    Text(
+                        text = formState.errorIdMateria!!,
+                        color = Color.Red,
+                    )
+                }
 
                 ValidatedTextField(
                     value = tarea.titulo,
                     label = "Título",
-                    onValueChange = viewModel::onTituloChange,
+                    onValueChange = tareaViewModel::onTituloChange,
                     errorMessage = formState.errorTitulo
                 )
 
                 ValidatedTextField(
                     value = tarea.descripcion,
                     label = "Descripción",
-                    onValueChange = viewModel::onDescripcionChange,
+                    onValueChange = tareaViewModel::onDescripcionChange,
                     errorMessage = formState.errorDescripcion
                 )
 
@@ -151,7 +189,7 @@ fun CrearTareaScreen(
                     label = "Prioridad",
                     options = listOf("Baja", "Media", "Alta"),
                     selectedValue = if (tarea.prioridad.isEmpty()) "Seleccione una opción" else tarea.prioridad,
-                    onOptionSelected = { _, option -> viewModel.onPrioridadChange(option) },
+                    onOptionSelected = { _, option -> tareaViewModel.onPrioridadChange(option) },
                     errorMessage = formState.errorPrioridad
                 )
 
@@ -195,7 +233,7 @@ fun CrearTareaScreen(
                     label = "Estatus",
                     options = listOf("Pendiente", "En progreso", "Finalizada"),
                     selectedValue = if (tarea.estatus.isEmpty()) estatusOptions.get(0) else tarea.estatus,
-                    onOptionSelected = { _, option -> viewModel.onEstatusChange(option) },
+                    onOptionSelected = { _, option -> tareaViewModel.onEstatusChange(option) },
                     errorMessage = formState.errorEstatus
                 )
 
@@ -210,7 +248,7 @@ fun CrearTareaScreen(
                     }
                     Button(
                         onClick = {
-                            if (viewModel.insertOrUpdate()) onBack()
+                            if (tareaViewModel.insertOrUpdate()) onBack()
                         }
                     ) {
                         Text(if (tareaId != null) "Guardar cambios" else "Crear tarea")
@@ -222,7 +260,7 @@ fun CrearTareaScreen(
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
                         showDialog = false
-                        viewModel.clean()
+                        tareaViewModel.clean()
                         onBack()
                     },
                     onDismiss = { showDialog = false },
@@ -234,7 +272,7 @@ fun CrearTareaScreen(
                     title = "Confirmar eliminación",
                     message = "¿Estás seguro de que deseas eliminar esta tarea? Esta acción no se puede deshacer.",
                     onConfirm = {
-                        tareaId?.let(viewModel::delete)
+                        tareaId?.let(tareaViewModel::delete)
                         showDeleteDialog = false
                         onBack()
                     },

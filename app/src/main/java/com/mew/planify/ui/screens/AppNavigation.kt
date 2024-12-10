@@ -40,13 +40,14 @@ fun AppNavigation(db: AppDatabase) {
     val materiaRepository = MateriaRepository(materiaDao)
     val materiaViewModel = MateriaViewModel(materiaRepository)
 
-    NavHost(navController = navController, startDestination = "mostrar_materias") {
+    NavHost(navController = navController, startDestination = "mostrar_tareas") {
         composable("crear_tarea") {
             CrearTareaScreen(
                 onBack = {
                     navController.popBackStack() // Regresar a la lista de tareas
                 },
-                viewModel = tareaViewModel
+                tareaViewModel = tareaViewModel,
+                materiaViewModel = materiaViewModel,
             )
         }
 
@@ -67,7 +68,8 @@ fun AppNavigation(db: AppDatabase) {
             val tareaId = backStackEntry.arguments?.getInt("tareaId") ?: 0
             CrearTareaScreen(
                 onBack = { navController.popBackStack() },
-                viewModel = tareaViewModel,
+                tareaViewModel = tareaViewModel,
+                materiaViewModel = materiaViewModel,
                 tareaId = tareaId
             )
 //            DetalleTareaScreen(
