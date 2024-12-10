@@ -38,7 +38,8 @@ class ProfesorViewModel(
     }
 
     fun clean() {
-        _profesor.value = ProfesorEntity() // Limpiar el formulario después de guardar
+        _profesor.value = ProfesorEntity() // Limpiar el formulario
+        _formState.value = FormState()
     }
 
     private fun getAll() {

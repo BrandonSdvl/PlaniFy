@@ -2,6 +2,15 @@ package com.mew.planify.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,6 +49,31 @@ fun AppNavigation(db: AppDatabase) {
     val materiaRepository = MateriaRepository(materiaDao)
     val materiaViewModel = MateriaViewModel(materiaRepository)
 
+    @Composable
+    fun navigator() {
+        NavigationBar {
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.List, contentDescription = "Tareas") },
+                label = { Text("Tareas") },
+                selected = navController.currentDestination?.route == "mostrar_tareas",
+                onClick = { navController.navigate("mostrar_tareas") }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Profesores") },
+                label = { Text("Profesores") },
+                selected = navController.currentDestination?.route == "mostrar_profesores",
+                onClick = { navController.navigate("mostrar_profesores") }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.Info, contentDescription = "Materias") },
+                label = { Text("Materias") },
+                selected = navController.currentDestination?.route == "mostrar_materias",
+                onClick = { navController.navigate("mostrar_materias") }
+            )
+        }
+
+    }
+
     NavHost(navController = navController, startDestination = "mostrar_tareas") {
         composable("crear_tarea") {
             CrearTareaScreen(
@@ -52,13 +86,16 @@ fun AppNavigation(db: AppDatabase) {
         }
 
         composable("mostrar_tareas") {
-            MostrarTareasScreen(
-                onCrearTareaClick = { navController.navigate("crear_tarea") },
-                onTareaClick = { tareaId ->
-                    navController.navigate("detalle_tarea/$tareaId")
-                },
-                viewModel = tareaViewModel
-            )
+            Column {
+                MostrarTareasScreen(
+                    onCrearTareaClick = { navController.navigate("crear_tarea") },
+                    onTareaClick = { tareaId ->
+                        navController.navigate("detalle_tarea/$tareaId")
+                    },
+                    viewModel = tareaViewModel,
+                    navigator = { navigator() }
+                )
+            }
         }
 
         composable(
@@ -72,11 +109,6 @@ fun AppNavigation(db: AppDatabase) {
                 materiaViewModel = materiaViewModel,
                 tareaId = tareaId
             )
-//            DetalleTareaScreen(
-//                tareaId = tareaId,
-//                onBack = { navController.popBackStack() },
-//                viewModel = viewModel
-//            )
         }
 
         composable("mostrar_profesores") {
@@ -85,7 +117,8 @@ fun AppNavigation(db: AppDatabase) {
                 onProfesorClick = { profesorId ->
                     navController.navigate("detalle_profesor/$profesorId")
                 },
-                viewModel = profesorViewModel
+                viewModel = profesorViewModel,
+                navigator = { navigator() }
             )
         }
 
@@ -115,7 +148,8 @@ fun AppNavigation(db: AppDatabase) {
                     navController.navigate("detalle_materia/$materiaId")
                 },
                 materiaViewModel = materiaViewModel,
-                profesorViewModel = profesorViewModel
+                profesorViewModel = profesorViewModel,
+                navigator = { navigator() }
             )
         }
 

@@ -35,7 +35,8 @@ import com.mew.planify.ui.common.LoadingIndicator
 fun MostrarTareasScreen(
     onCrearTareaClick: () -> Unit,
     onTareaClick: (Int) -> Unit,
-    viewModel: TareaViewModel
+    viewModel: TareaViewModel,
+    navigator: @Composable () -> Unit
 ) {
     val tareas by viewModel.tareas.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -74,7 +75,8 @@ fun MostrarTareasScreen(
                     }
                 }
             }
-        }
+        },
+        bottomBar = navigator
     )
 }
 

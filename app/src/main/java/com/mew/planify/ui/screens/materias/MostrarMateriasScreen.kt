@@ -36,7 +36,8 @@ fun MostrarMateriasScreen(
     onCrearMateriaClick: () -> Unit,
     onMateriaClick: (Int) -> Unit,
     materiaViewModel: MateriaViewModel,
-    profesorViewModel: ProfesorViewModel
+    profesorViewModel: ProfesorViewModel,
+    navigator: @Composable () -> Unit
 ) {
     val materias by materiaViewModel.materias.collectAsState()
     val loading by materiaViewModel.loading.collectAsState()
@@ -79,6 +80,9 @@ fun MostrarMateriasScreen(
                     }
                 }
             }
+        },
+        bottomBar = {
+            navigator()
         }
     )
 }

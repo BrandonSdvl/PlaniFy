@@ -53,12 +53,17 @@ fun CrearMateriaScreen (
 
     var expanded = remember { mutableStateOf(false) }
 
-    LaunchedEffect(idMateria) {
-        if (idMateria != null) {
+    LaunchedEffect(key1 = idMateria) {
+        if (idMateria == null) {
+            materiaViewModel.clean()
+            showDeleteDialog = false
+            showDialog = false
+        } else {
             val materia = materiaViewModel.findById(idMateria).firstOrNull()
             materia?.let { materiaViewModel.setMateria(it) }
         }
     }
+
 
     val materia by materiaViewModel.materia.collectAsState()
 

@@ -12,10 +12,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,7 +38,8 @@ import com.mew.planify.ui.viewmodel.ProfesorViewModel
 fun MostrarProfesoresScreen(
     onCrearProfesorClick: () -> Unit,
     onProfesorClick: (Int) -> Unit,
-    viewModel: ProfesorViewModel
+    viewModel: ProfesorViewModel,
+    navigator: @Composable () -> Unit
 ) {
     val profesores by viewModel.profesores.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -75,6 +79,9 @@ fun MostrarProfesoresScreen(
                 }
 
             }
+        },
+        bottomBar = {
+            navigator()
         }
     )
 }

@@ -63,8 +63,19 @@ fun CrearTareaScreen(
 
     val formState by tareaViewModel.formState
 
-    LaunchedEffect(tareaId) {
-        if (tareaId != null) {
+//    LaunchedEffect(tareaId) {
+//        if (tareaId != null) {
+//            val tarea = tareaViewModel.findById(tareaId).firstOrNull()
+//            tarea?.let { tareaViewModel.setTarea(it) }
+//        }
+//    }
+
+    LaunchedEffect(key1 = tareaId) {
+        if (tareaId == null) {
+            tareaViewModel.clean()
+            showDeleteDialog = false
+            showDialog = false
+        } else {
             val tarea = tareaViewModel.findById(tareaId).firstOrNull()
             tarea?.let { tareaViewModel.setTarea(it) }
         }

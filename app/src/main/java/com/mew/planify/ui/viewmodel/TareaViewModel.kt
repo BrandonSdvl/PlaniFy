@@ -40,7 +40,8 @@ class TareaViewModel(
     }
 
     fun clean() {
-        _tarea.value = TareaEntity() // Limpiar el formulario después de guardar
+        _tarea.value = TareaEntity() // Limpiar el formulario
+        _formState.value = FormState()
     }
 
     private fun getAll() {

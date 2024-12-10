@@ -38,7 +38,8 @@ class MateriaViewModel(
     }
 
     fun clean() {
-        _materia.value = MateriaEntity() // Limpiar el formulario después de guardar
+        _materia.value = MateriaEntity() // Limpiar el formulario
+        _formState.value = FormState()
     }
 
     private fun getAll() {

@@ -42,8 +42,12 @@ fun CrearProfesorScreen(
 
     val formState by viewModel.formState
 
-    LaunchedEffect(profesorId) {
-        if (profesorId != null) {
+    LaunchedEffect(key1 = profesorId) {
+        if (profesorId == null) {
+            viewModel.clean()
+            showDeleteDialog = false
+            showDialog = false
+        } else {
             val tarea = viewModel.findById(profesorId).firstOrNull()
             tarea?.let { viewModel.setProfesor(it) }
         }
