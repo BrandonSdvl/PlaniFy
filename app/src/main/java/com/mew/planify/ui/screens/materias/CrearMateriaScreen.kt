@@ -167,7 +167,7 @@ fun CrearMateriaScreen (
                     }
                 }
 
-                if (showDialog) ConfirmDialog(
+                if (showDialog && materiaViewModel.changed.collectAsState().value) ConfirmDialog(
                     title = if (idMateria != null) "Cancelar edición" else "Cancelar creación",
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
@@ -179,6 +179,12 @@ fun CrearMateriaScreen (
                     confirmButtonText = "Salir",
                     dimissButtonText = if (idMateria != null) "Seguir editando" else "Continuar"
                 )
+
+                if (showDialog && !materiaViewModel.changed.collectAsState().value) {
+                    showDialog = false
+                    onBack()
+                }
+
 
                 if (showDeleteDialog) ConfirmDialog(
                     title = "Confirmar eliminación",

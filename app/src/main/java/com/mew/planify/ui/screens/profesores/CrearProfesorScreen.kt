@@ -26,6 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mew.planify.ui.common.ConfirmDialog
+import com.mew.planify.ui.common.ValidatedNumberTextField
+import com.mew.planify.ui.common.ValidatedTextArea
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.ProfesorViewModel
 import kotlinx.coroutines.flow.firstOrNull
@@ -100,14 +102,14 @@ fun CrearProfesorScreen(
                     errorMessage = formState.errorCorreo
                 )
 
-                ValidatedTextField(
+                ValidatedNumberTextField(
                     value = profesor.telefono?: "",
                     label = "Teléfono",
                     onValueChange = viewModel::onTelefonoChange,
                     errorMessage = formState.errorTelefono
                 )
 
-                ValidatedTextField(
+                ValidatedNumberTextField(
                     value = profesor.cubiculo?: "",
                     label = "Cubículo",
                     onValueChange = viewModel::onCubiculoChange,
@@ -121,7 +123,7 @@ fun CrearProfesorScreen(
                     errorMessage = formState.errorAcademia
                 )
 
-                ValidatedTextField(
+                ValidatedTextArea(
                     value = profesor.nota?: "",
                     label = "Nota",
                     onValueChange = viewModel::onNotaChange,
@@ -146,7 +148,7 @@ fun CrearProfesorScreen(
                     }
                 }
 
-                if (showDialog) ConfirmDialog(
+                if (showDialog && viewModel.changed.collectAsState().value) ConfirmDialog(
                     title = if (profesorId != null) "Cancelar edición" else "Cancelar creación",
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
@@ -158,6 +160,11 @@ fun CrearProfesorScreen(
                     confirmButtonText = "Salir",
                     dimissButtonText = if (profesorId != null) "Seguir editando" else "Continuar"
                 )
+
+                if (showDialog && !viewModel.changed.collectAsState().value) {
+                    showDialog = false
+                    onBack()
+                }
 
                 if (showDeleteDialog) ConfirmDialog(
                     title = "Confirmar eliminación",

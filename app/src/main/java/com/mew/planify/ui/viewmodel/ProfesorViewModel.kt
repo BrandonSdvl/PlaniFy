@@ -33,6 +33,9 @@ class ProfesorViewModel(
     private val _profesor = MutableStateFlow<ProfesorEntity>(ProfesorEntity())
     val profesor: StateFlow<ProfesorEntity> = _profesor
 
+    private val _changed = MutableStateFlow(false)
+    val changed: StateFlow<Boolean> = _changed
+
     init {
         getAll()
     }
@@ -40,6 +43,7 @@ class ProfesorViewModel(
     fun clean() {
         _profesor.value = ProfesorEntity() // Limpiar el formulario
         _formState.value = FormState()
+        _changed.value = false
     }
 
     private fun getAll() {
@@ -180,6 +184,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorNombre = validateNombre(nuevoNombre)
         )
+
+        _changed.value = true
     }
 
     fun onCorreoChange(nuevoCorreo: String) {
@@ -190,6 +196,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorCorreo = validateCorreo(nuevoCorreo)
         )
+
+        _changed.value = true
     }
 
     fun onTelefonoChange(nuevoTelefono: String) {
@@ -200,6 +208,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorTelefono = validateTelefono(nuevoTelefono)
         )
+
+        _changed.value = true
     }
 
     fun onCubiculoChange(nuevoCubiculo: String) {
@@ -210,6 +220,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorCubiculo = validateCubiculo(nuevoCubiculo)
         )
+
+        _changed.value = true
     }
 
     fun onAcademiaChange(nuevaAcademia: String) {
@@ -220,6 +232,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorAcademia = validateAcademia(nuevaAcademia)
         )
+
+        _changed.value = true
     }
 
     fun onNotaChange(nuevaNota: String) {
@@ -230,6 +244,8 @@ class ProfesorViewModel(
         _formState.value = _formState.value.copy(
             errorNota = validateNota(nuevaNota)
         )
+
+        _changed.value = true
     }
 
     data class FormState(

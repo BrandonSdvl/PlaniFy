@@ -38,8 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.mew.planify.data.local.entities.MateriaEntity
 import com.mew.planify.ui.common.ConfirmDialog
 import com.mew.planify.ui.common.DropdownField
+import com.mew.planify.ui.common.ValidatedTextArea
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.TareaViewModel
@@ -63,13 +65,6 @@ fun CrearTareaScreen(
 
     val formState by tareaViewModel.formState
 
-//    LaunchedEffect(tareaId) {
-//        if (tareaId != null) {
-//            val tarea = tareaViewModel.findById(tareaId).firstOrNull()
-//            tarea?.let { tareaViewModel.setTarea(it) }
-//        }
-//    }
-
     LaunchedEffect(key1 = tareaId) {
         if (tareaId == null) {
             tareaViewModel.clean()
@@ -83,7 +78,7 @@ fun CrearTareaScreen(
 
     val tarea by tareaViewModel.tarea.collectAsState()
 
-    val materiasOptions = materiaViewModel.materias.collectAsState(emptyList()).value
+    val materiasOptions = listOf(MateriaEntity(nombre = "Sin asignar")) + materiaViewModel.materias.collectAsState(emptyList()).value
     val estatusOptions = listOf("Pendiente", "En progreso", "Finalizada")
 
     val context = LocalContext.current
@@ -91,8 +86,6 @@ fun CrearTareaScreen(
     val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     var expanded = remember { mutableStateOf(false) }
-
-    calendar.add(Calendar.DAY_OF_MONTH, 1)
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -148,7 +141,7 @@ fun CrearTareaScreen(
                     onExpandedChange = { expanded.value = !expanded.value }
                 ) {
                     OutlinedTextField(
-                        value = (if (tarea.idMateria == null) "Seleccione una opción" else materiaViewModel.findById(tarea.idMateria!!).collectAsState(null).value?.nombre) ?: "Seleccione una opción",
+                        value = (if (tarea.idMateria == null) "Sin asignar" else materiaViewModel.findById(tarea.idMateria!!).collectAsState(null).value?.nombre) ?: "Seleccione una opción",
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Materia") },
@@ -163,11 +156,11 @@ fun CrearTareaScreen(
                         expanded = expanded.value,
                         onDismissRequest = { expanded.value = false }
                     ) {
-                        materiasOptions.forEach { materia ->
+                        materiasOptions.forEachIndexed { index, materia ->
                             DropdownMenuItem(
                                 text = { Text(materia.nombre) },
                                 onClick = {
-                                    tareaViewModel.onIdMateriaChange(materia.id)
+                                    tareaViewModel.onIdMateriaChange(if (index == 0) null else materia.id)
                                     expanded.value = false
                                 }
                             )
@@ -189,7 +182,7 @@ fun CrearTareaScreen(
                     errorMessage = formState.errorTitulo
                 )
 
-                ValidatedTextField(
+                ValidatedTextArea(
                     value = tarea.descripcion,
                     label = "Descripción",
                     onValueChange = tareaViewModel::onDescripcionChange,
@@ -266,7 +259,7 @@ fun CrearTareaScreen(
                     }
                 }
 
-                if (showDialog) ConfirmDialog(
+                if (showDialog && tareaViewModel.changed.collectAsState().value) ConfirmDialog(
                     title = if (tareaId != null) "Cancelar edición" else "Cancelar creación",
                     message = "¿Estás seguro de que deseas cancelar? Los cambios no se guardarán.",
                     onConfirm = {
@@ -278,6 +271,11 @@ fun CrearTareaScreen(
                     confirmButtonText = "Salir",
                     dimissButtonText = if (tareaId != null) "Seguir editando" else "Continuar"
                 )
+
+                if (showDialog && !tareaViewModel.changed.collectAsState().value) {
+                    showDialog = false
+                    onBack()
+                }
 
                 if (showDeleteDialog) ConfirmDialog(
                     title = "Confirmar eliminación",

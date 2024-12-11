@@ -35,6 +35,9 @@ class TareaViewModel(
     private val _tarea = MutableStateFlow<TareaEntity>(TareaEntity())
     val tarea: StateFlow<TareaEntity> = _tarea
 
+    private val _changed = MutableStateFlow(false)
+    val changed: StateFlow<Boolean> = _changed
+
     init {
         getAll()
     }
@@ -42,6 +45,7 @@ class TareaViewModel(
     fun clean() {
         _tarea.value = TareaEntity() // Limpiar el formulario
         _formState.value = FormState()
+        _changed.value = false
     }
 
     private fun getAll() {
@@ -129,7 +133,7 @@ class TareaViewModel(
 
     private fun validateIdMateria(idMateria: Int?): String? {
         return when {
-            idMateria == null -> "Seleccione una materia"
+//            idMateria == null -> "Seleccione una materia"
             else -> null
         }
     }
@@ -170,6 +174,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorIdMateria = validateIdMateria(nuevoIdMateria)
         )
+
+        _changed.value = true
     }
 
     fun onTituloChange(nuevoTitulo: String) {
@@ -180,6 +186,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorTitulo = validateTitulo(nuevoTitulo)
         )
+
+        _changed.value = true
     }
 
     fun onDescripcionChange(nuevaDescripcion: String) {
@@ -190,6 +198,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorDescripcion = validateDescripcion(nuevaDescripcion)
         )
+
+        _changed.value = true
     }
 
     fun onEstatusChange(nuevoEstatus: String) {
@@ -199,6 +209,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorEstatus = validateEstatus(nuevoEstatus)
         )
+
+        _changed.value = true
     }
 
     fun onPrioridadChange(nuevaPrioridad: String) {
@@ -208,6 +220,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorPrioridad = validatePrioridad(nuevaPrioridad)
         )
+
+        _changed.value = true
     }
 
     fun onFechaEntregaChange(nuevaFechaEntrega: Date?) {
@@ -217,6 +231,8 @@ class TareaViewModel(
         _formState.value = _formState.value.copy(
             errorFechaEntrega = validateFechaEntrega(nuevaFechaEntrega)
         )
+
+        _changed.value = true
     }
 
     data class FormState(

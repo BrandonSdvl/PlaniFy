@@ -33,6 +33,9 @@ class MateriaViewModel(
     private val _materia = MutableStateFlow<MateriaEntity>(MateriaEntity())
     val materia: StateFlow<MateriaEntity> = _materia
 
+    private val _changed = MutableStateFlow(false)
+    val changed: StateFlow<Boolean> = _changed
+
     init {
         getAll()
     }
@@ -40,6 +43,7 @@ class MateriaViewModel(
     fun clean() {
         _materia.value = MateriaEntity() // Limpiar el formulario
         _formState.value = FormState()
+        _changed.value = false
     }
 
     private fun getAll() {
@@ -146,6 +150,8 @@ class MateriaViewModel(
         _formState.value = _formState.value.copy(
             errorSecuencia = validateSecuencia(nuevaSecuencia)
         )
+
+        _changed.value = true
     }
 
     fun onNombreChange(nuevoNombre: String) {
@@ -156,6 +162,8 @@ class MateriaViewModel(
         _formState.value = _formState.value.copy(
             errorNombre = validateNombre(nuevoNombre)
         )
+
+        _changed.value = true
     }
 
     fun onIdProfesorChange(nuevoIdProfesor: Int?) {
@@ -166,6 +174,8 @@ class MateriaViewModel(
         _formState.value = _formState.value.copy(
             errorIdProfesor = validateIdProfesor(nuevoIdProfesor)
         )
+
+        _changed.value = true
     }
 
     data class FormState(
