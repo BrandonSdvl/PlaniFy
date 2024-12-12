@@ -33,7 +33,5 @@ fun ValidatedNumberTextField(
             keyboardType = KeyboardType.Number // Muestra el teclado numérico
         )
     )
-    errorMessage?.let {
-        Text(it, color = Color.Red, modifier = Modifier.padding(top = 4.dp))
-    }
+    TextErrorMessage(errorMessage)
 }

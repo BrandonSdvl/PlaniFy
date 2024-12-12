@@ -34,7 +34,6 @@ fun ValidatedTextArea(
         maxLines = maxLines,
         singleLine = false // Permitir múltiples líneas
     )
-    errorMessage?.let {
-        Text(it, color = Color.Red, modifier = Modifier.padding(top = 4.dp))
-    }
+
+    TextErrorMessage(errorMessage)
 }

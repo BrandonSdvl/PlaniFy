@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mew.planify.data.local.dao.HorarioInfo
 import com.mew.planify.ui.viewmodel.HorarioViewModel
@@ -71,7 +75,7 @@ fun HorarioScreen(
                     .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(padding)
-                    .padding(16.dp),
+                    .padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Selector de días
@@ -93,7 +97,14 @@ fun HorarioScreen(
                     }
 
                     // Texto del día actual
-                    Text(currDay.value, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        currDay.value,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
+
 
                     // Botón para ir al día siguiente
                     IconButton(onClick = {
@@ -108,36 +119,71 @@ fun HorarioScreen(
 
                 // Mostrar clases o mensaje vacío
                 if (materias.isEmpty()) {
-                    Text("No hay clases registradas para este día")
+                    Text(
+                        "No hay clases registradas para este día",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 } else {
                     materias.forEach { materia ->
-                        Column(
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp)
-                                .clickable { onMateriaClick(materia.id) }
+                                .padding(8.dp)
+                                .clickable { onMateriaClick(materia.id) },
+                            shape = RoundedCornerShape(10.dp), // Bordes redondeados
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh // Color de fondo tenue
+                            )
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(materia.hora_inicio.toString(), Modifier.weight(1f))
-                                Text(materia.nombre_materia, Modifier.weight(2f))
-                                Text(materia.edificio, Modifier.weight(1f))
-                            }
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                // Fila de la primera parte de la materia
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().padding(4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        materia.hora_inicio.toString(),
+                                        Modifier.weight(1f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        materia.nombre_materia,
+                                        Modifier.weight(3f),
+                                        style = MaterialTheme.typography.bodyLarge.copy(
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    )
+                                    Text(
+                                        materia.edificio,
+                                        Modifier.weight(1f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
 
-                            Row(
-                                modifier = Modifier.fillMaxWidth().padding(4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(materia.hora_fin.toString(), Modifier.weight(1f))
-                                Text(materia.nombre_profesor, Modifier.weight(2f))
-                                Text(materia.salon, Modifier.weight(1f))
+                                // Fila de la segunda parte de la materia
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        materia.hora_fin.toString(),
+                                        Modifier.weight(1f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        materia.nombre_profesor,
+                                        Modifier.weight(3f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        materia.salon,
+                                        Modifier.weight(1f),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
-
-                            // Separador
-                            Divider()
                         }
+
                     }
                 }
             }

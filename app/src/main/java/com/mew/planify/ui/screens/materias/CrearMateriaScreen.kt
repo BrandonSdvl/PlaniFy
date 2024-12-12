@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mew.planify.data.local.entities.ProfesorEntity
 import com.mew.planify.ui.common.ConfirmDialog
+import com.mew.planify.ui.common.TextErrorMessage
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.HorarioViewModel
 import com.mew.planify.ui.viewmodel.MateriaViewModel
@@ -180,9 +181,7 @@ fun CrearMateriaScreen (
                     }
                 }
 
-                formState.errorIdProfesor?.let {
-                    Text(it, color = Color.Red)
-                }
+                TextErrorMessage(formState.errorIdProfesor)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -231,7 +230,7 @@ fun CrearMateriaScreen (
                         tint = MaterialTheme.colorScheme.primary // Color del ícono
                     )
                     Text(
-                        text = "Agregar materia ",
+                        text = "Agregar clase ",
                         style = MaterialTheme.typography.bodyMedium // Estilo de texto
                     )
                 }

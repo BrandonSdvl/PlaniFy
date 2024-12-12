@@ -56,7 +56,5 @@ fun DropdownField(
             }
         }
     }
-    errorMessage?.let {
-        Text(it, color = Color.Red)
-    }
+    TextErrorMessage(errorMessage)
 }

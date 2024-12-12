@@ -5,6 +5,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -41,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.mew.planify.data.local.entities.MateriaEntity
 import com.mew.planify.ui.common.ConfirmDialog
 import com.mew.planify.ui.common.DropdownField
+import com.mew.planify.ui.common.TextErrorMessage
 import com.mew.planify.ui.common.ValidatedTextArea
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.MateriaViewModel
@@ -64,6 +69,8 @@ fun CrearTareaScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val formState by tareaViewModel.formState
+
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = tareaId) {
         if (tareaId == null) {
@@ -104,6 +111,13 @@ fun CrearTareaScreen(
 
     datePickerDialog.datePicker.minDate = calendar.timeInMillis
 
+    val fechaSource = remember {
+        MutableInteractionSource()
+    }
+
+    if ( fechaSource.collectIsPressedAsState().value)
+        datePickerDialog.show()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -130,9 +144,10 @@ fun CrearTareaScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .padding(padding)
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
                 Text(if (tareaId != null) "Editar tarea" else "Crear tarea")
 
@@ -168,12 +183,7 @@ fun CrearTareaScreen(
                     }
                 }
 
-                if (formState.errorIdMateria != null) {
-                    Text(
-                        text = formState.errorIdMateria!!,
-                        color = Color.Red,
-                    )
-                }
+                TextErrorMessage(formState.errorIdMateria)
 
                 ValidatedTextField(
                     value = tarea.titulo,
@@ -205,33 +215,15 @@ fun CrearTareaScreen(
                     readOnly = true, // Campo de solo lectura
                     label = { Text("Fecha de entrega") },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            datePickerDialog.show()
-                        },
+                        .fillMaxWidth(),
                     trailingIcon = {
                         Icon(Icons.Default.DateRange, contentDescription = "Abrir calendario")
                     },
+                    interactionSource = fechaSource,
                     isError = formState.errorFechaEntrega != null,
                 )
 
-                if (formState.errorFechaEntrega != null) {
-                    Text(
-                        text = formState.errorFechaEntrega!!,
-                        color = Color.Red,
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Button(
-                        onClick = { datePickerDialog.show() }) {
-                        Text("Seleccionar fecha")
-                    }
-                }
+                TextErrorMessage(formState.errorFechaEntrega)
 
                 DropdownField(
                     label = "Estatus",

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mew.planify.ui.common.DropdownField
+import com.mew.planify.ui.common.TextErrorMessage
 import com.mew.planify.ui.common.ValidatedTextField
 import com.mew.planify.ui.viewmodel.HorarioViewModel
 import java.time.LocalTime
@@ -97,9 +98,8 @@ fun FormClase(viewModel: HorarioViewModel, index: Int) {
             readOnly = true,
             isError = viewModel.formState.collectAsState().value[index].errorHoraInicio != null
         )
-        viewModel.formState.collectAsState().value[index].errorHoraInicio?.let {
-            Text(it, color = Color.Red)
-        }
+
+        TextErrorMessage(viewModel.formState.collectAsState().value[index].errorHoraInicio)
 
         OutlinedTextField(
             value = viewModel.currClases.collectAsState().value[index].horaFin.format(formatter),
@@ -110,9 +110,8 @@ fun FormClase(viewModel: HorarioViewModel, index: Int) {
             readOnly = true,
             isError = viewModel.formState.collectAsState().value[index].errorHoraFin != null
         )
-        viewModel.formState.collectAsState().value[index].errorHoraFin?.let {
-            Text(it, color = Color.Red)
-        }
+
+        TextErrorMessage(viewModel.formState.collectAsState().value[index].errorHoraFin)
 
         if (showHoraInicioDialog.value) {
             TimePickerDialog(
