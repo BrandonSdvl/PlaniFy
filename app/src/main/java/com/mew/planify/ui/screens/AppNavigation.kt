@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mew.planify.data.local.AppDatabase
+import com.mew.planify.data.repository.HorarioRepository
 import com.mew.planify.data.repository.MateriaRepository
 import com.mew.planify.data.repository.ProfesorRepository
 import com.mew.planify.data.repository.TareaRepository
@@ -27,6 +28,7 @@ import com.mew.planify.ui.screens.profesores.CrearProfesorScreen
 import com.mew.planify.ui.screens.profesores.MostrarProfesoresScreen
 import com.mew.planify.ui.screens.tareas.MostrarTareasScreen
 import com.mew.planify.ui.screens.tareas.CrearTareaScreen
+import com.mew.planify.ui.viewmodel.HorarioViewModel
 import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.ProfesorViewModel
 import com.mew.planify.ui.viewmodel.TareaViewModel
@@ -45,9 +47,13 @@ fun AppNavigation(db: AppDatabase) {
     val profesorRepository = ProfesorRepository(profesorDao)
     val profesorViewModel = ProfesorViewModel(profesorRepository)
 
+    val horarioDao = db.horarioDao()
+    val horarioRepository = HorarioRepository(horarioDao)
+    val horarioViewModel = HorarioViewModel(horarioRepository)
+
     val materiaDao = db.materiaDao()
     val materiaRepository = MateriaRepository(materiaDao)
-    val materiaViewModel = MateriaViewModel(materiaRepository)
+    val materiaViewModel = MateriaViewModel(materiaRepository, horarioRepository)
 
     @Composable
     fun navigator() {
@@ -81,7 +87,7 @@ fun AppNavigation(db: AppDatabase) {
                     navController.popBackStack() // Regresar a la lista de tareas
                 },
                 tareaViewModel = tareaViewModel,
-                materiaViewModel = materiaViewModel,
+                materiaViewModel = materiaViewModel
             )
         }
 
@@ -157,7 +163,8 @@ fun AppNavigation(db: AppDatabase) {
             CrearMateriaScreen(
                 onBack = { navController.popBackStack() },
                 materiaViewModel = materiaViewModel,
-                profesorViewModel = profesorViewModel
+                profesorViewModel = profesorViewModel,
+                horarioViewModel = horarioViewModel
             )
         }
 
@@ -169,7 +176,8 @@ fun AppNavigation(db: AppDatabase) {
                 onBack = { navController.popBackStack() },
                 materiaViewModel = materiaViewModel,
                 profesorViewModel = profesorViewModel,
-                idMateria = backStackEntry.arguments?.getInt("materiaId") ?: 0
+                idMateria = backStackEntry.arguments?.getInt("materiaId") ?: 0,
+                horarioViewModel = horarioViewModel
             )
         }
     }
