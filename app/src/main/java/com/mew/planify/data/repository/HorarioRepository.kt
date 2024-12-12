@@ -3,6 +3,7 @@ package com.mew.planify.data.repository
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.mew.planify.data.local.dao.HorarioDao
+import com.mew.planify.data.local.dao.HorarioInfo
 import com.mew.planify.data.local.entities.HorarioEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalTime
@@ -67,6 +68,11 @@ class HorarioRepository(private val horarioDao: HorarioDao) {
         return null // No hay conflictos
     }
 
+    fun getHorarioInfo(): List<HorarioInfo> {
+        return horarioDao.getHorarioInfo()
+    }
 
-
+    suspend fun getHorarioInfoByDay(day: String): List<HorarioInfo> {
+        return horarioDao.getHorarioInfoByDay(day)
+    }
 }

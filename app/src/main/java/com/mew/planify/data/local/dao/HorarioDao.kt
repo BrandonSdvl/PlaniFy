@@ -37,4 +37,17 @@ interface HorarioDao {
 """)
     suspend fun getHorariosExcluyendoMateria(idMateriaExcluida: Int): List<HorarioEntity>
 
+    @Query("SELECT h.id, h.dia_semana, h.hora_inicio, h.hora_fin, h.edificio, h.salon, m.nombre AS nombre_materia, p.nombre AS nombre_profesor " +
+            "FROM horario h " +
+            "INNER JOIN materias m ON h.id_materia = m.id " +
+            "INNER JOIN profesores p ON m.idProfesor = p.id")
+    fun getHorarioInfo(): List<HorarioInfo>
+
+
+    @Query("SELECT h.id, h.dia_semana, h.hora_inicio, h.hora_fin, h.edificio, h.salon, m.nombre AS nombre_materia, p.nombre AS nombre_profesor " +
+            "FROM horario h " +
+            "INNER JOIN materias m ON h.id_materia = m.id " +
+            "INNER JOIN profesores p ON m.idProfesor = p.id " +
+            "WHERE h.dia_semana = :day")
+    suspend fun getHorarioInfoByDay(day: String): List<HorarioInfo>
 }

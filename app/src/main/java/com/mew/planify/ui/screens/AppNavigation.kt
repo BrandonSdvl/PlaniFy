@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import com.mew.planify.data.repository.HorarioRepository
 import com.mew.planify.data.repository.MateriaRepository
 import com.mew.planify.data.repository.ProfesorRepository
 import com.mew.planify.data.repository.TareaRepository
+import com.mew.planify.ui.screens.horario.HorarioScreen
 import com.mew.planify.ui.screens.materias.CrearMateriaScreen
 import com.mew.planify.ui.screens.materias.MostrarMateriasScreen
 import com.mew.planify.ui.screens.profesores.CrearProfesorScreen
@@ -63,6 +65,12 @@ fun AppNavigation(db: AppDatabase) {
                 label = { Text("Tareas") },
                 selected = navController.currentDestination?.route == "mostrar_tareas",
                 onClick = { navController.navigate("mostrar_tareas") }
+            )
+            NavigationBarItem(
+                icon = { Icon(Icons.Default.DateRange, contentDescription = "Horario") },
+                label = { Text("Horario") },
+                selected = navController.currentDestination?.route == "horario",
+                onClick = { navController.navigate("horario") }
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Profesores") },
@@ -178,6 +186,16 @@ fun AppNavigation(db: AppDatabase) {
                 profesorViewModel = profesorViewModel,
                 idMateria = backStackEntry.arguments?.getInt("materiaId") ?: 0,
                 horarioViewModel = horarioViewModel
+            )
+        }
+
+        composable("horario") {
+            HorarioScreen(
+                horarioViewModel = horarioViewModel,
+                navigator = { navigator() },
+                onMateriaClick = { materiaId ->
+                    navController.navigate("detalle_materia/$materiaId")
+                },
             )
         }
     }

@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mew.planify.data.local.dao.HorarioInfo
 import com.mew.planify.data.local.entities.HorarioEntity
 import com.mew.planify.data.repository.HorarioRepository
 import kotlinx.coroutines.flow.Flow
@@ -134,6 +135,14 @@ class HorarioViewModel(private val repository: HorarioRepository) : ViewModel() 
 
     fun setHorario(horario: HorarioEntity) {
         _clase.value = horario
+    }
+
+    fun getHorarioInfo(): List<HorarioInfo> {
+        return repository.getHorarioInfo()
+    }
+
+    suspend fun getHorarioInfoByDay(day: String): List<HorarioInfo> {
+        return repository.getHorarioInfoByDay(day)
     }
 
     private fun validate(index: Int, horario: HorarioEntity): Boolean {

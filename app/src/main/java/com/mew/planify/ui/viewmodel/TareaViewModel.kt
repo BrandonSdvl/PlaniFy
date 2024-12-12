@@ -51,7 +51,6 @@ class TareaViewModel(
     private fun getAll() {
         viewModelScope.launch {
             _loading.value = true // Mostrar indicador de carga
-            delay(3000)
             try {
                 repository.getAll()
                     .stateIn(
