@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProfesorDao {
-    @Query("SELECT * FROM profesores")
+    @Query("SELECT * FROM profesores  ORDER BY nombre ASC")
     fun getAll(): Flow<List<ProfesorEntity>>
 
     @Upsert

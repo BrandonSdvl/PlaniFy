@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -35,6 +36,9 @@ class ProfesorViewModel(
 
     private val _changed = MutableStateFlow(false)
     val changed: StateFlow<Boolean> = _changed
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage = _snackbarMessage.asStateFlow()
 
     init {
         getAll()
@@ -79,10 +83,15 @@ class ProfesorViewModel(
                     _error.value = e.message
                 }
             }
+            _snackbarMessage.value = "Profesor guardado exitosamente"
             return true
         } else {
             return false
         }
+    }
+
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
     }
 
     fun delete(profesorId: Int) {
@@ -138,7 +147,7 @@ class ProfesorViewModel(
     private fun validateCorreo(correo: String): String? {
         return when {
             correo.isBlank() -> null
-            correo.length > 40 -> "El correo no puede tener más de 40 caracteres"
+            correo.length > 30 -> "El correo no puede tener más de 30 caracteres"
             !correo.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")) ->
                 "El correo tiene un formato inválido"
             else -> null

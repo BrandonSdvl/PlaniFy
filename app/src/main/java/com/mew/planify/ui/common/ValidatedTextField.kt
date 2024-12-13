@@ -1,6 +1,7 @@
 package com.mew.planify.ui.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -9,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.text.input.KeyboardCapitalization
 
 
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,9 @@ fun ValidatedTextField(
             },
         isError = errorMessage != null,
         maxLines = 1,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences // Primera letra en mayúscula por oración
+        ),
     )
 
     // Mostrar mensaje de error debajo del campo de texto si hay uno

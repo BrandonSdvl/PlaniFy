@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MateriaDao {
-    @Query("SELECT * FROM materias")
+    @Query("SELECT * FROM materias ORDER BY nombre ASC")
     fun getAll(): Flow<List<MateriaEntity>>
 
     @Query("SELECT * FROM materias WHERE id = :id")

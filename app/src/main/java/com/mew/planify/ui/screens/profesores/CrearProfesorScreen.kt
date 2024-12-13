@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.mew.planify.ui.common.ConfirmDialog
+import com.mew.planify.ui.common.CopiableNumberField
 import com.mew.planify.ui.common.CopiableTextField
 import com.mew.planify.ui.common.ValidatedNumberTextField
 import com.mew.planify.ui.common.ValidatedTextArea
@@ -104,7 +105,7 @@ fun CrearProfesorScreen(
                     errorMessage = formState.errorCorreo
                 )
 
-                CopiableTextField(
+                CopiableNumberField(
                     value = profesor.telefono?: "",
                     label = "Teléfono",
                     onValueChange = viewModel::onTelefonoChange,

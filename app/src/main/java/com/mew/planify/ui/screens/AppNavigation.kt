@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -79,7 +80,7 @@ fun AppNavigation(db: AppDatabase) {
                 onClick = { navController.navigate("mostrar_profesores") }
             )
             NavigationBarItem(
-                icon = { Icon(Icons.Default.Info, contentDescription = "Materias") },
+                icon = { Icon(Icons.Default.MenuBook, contentDescription = "Materias") },
                 label = { Text("Materias") },
                 selected = navController.currentDestination?.route == "mostrar_materias",
                 onClick = { navController.navigate("mostrar_materias") }

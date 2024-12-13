@@ -3,6 +3,7 @@ package com.mew.planify.ui.screens.materias
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,12 +44,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mew.planify.data.local.entities.ProfesorEntity
 import com.mew.planify.ui.common.ConfirmDialog
 import com.mew.planify.ui.common.TextErrorMessage
 import com.mew.planify.ui.common.ValidatedTextField
+import com.mew.planify.ui.theme.primaryDark
+import com.mew.planify.ui.theme.primaryLight
 import com.mew.planify.ui.viewmodel.HorarioViewModel
 import com.mew.planify.ui.viewmodel.MateriaViewModel
 import com.mew.planify.ui.viewmodel.ProfesorViewModel
@@ -67,6 +69,8 @@ fun CrearMateriaScreen (
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteClaseDialog by remember { mutableStateOf(false) }
+    var currIndex by remember { mutableStateOf(-1) }
 
     val formState by materiaViewModel.formState
     val profesorOptions = listOf(ProfesorEntity(nombre = "Sin asignar")) + profesorViewModel.profesores.collectAsState(emptyList()).value
@@ -77,6 +81,7 @@ fun CrearMateriaScreen (
 
     val scope = rememberCoroutineScope()
 
+    val BlueGray = if(isSystemInDarkTheme()) primaryDark else primaryLight
 
     LaunchedEffect(key1 = idMateria) {
         if (idMateria == null) {
@@ -84,6 +89,7 @@ fun CrearMateriaScreen (
             horarioViewModel.clean()
             showDeleteDialog = false
             showDialog = false
+            showDeleteClaseDialog = false
         } else {
             val materia = materiaViewModel.findById(idMateria).firstOrNull()
             materia?.let { materiaViewModel.setMateria(it) }
@@ -205,7 +211,10 @@ fun CrearMateriaScreen (
                                 ) {
                                     Text("Clase ${index + 1}", style = MaterialTheme.typography.titleMedium)
                                     Spacer(modifier = Modifier.weight(1f))
-                                    IconButton(onClick = { horarioViewModel.deleteClase(index) }) {
+                                    IconButton(onClick = {
+                                        showDeleteClaseDialog = true
+                                        currIndex = index
+                                    }) {
                                         Icon(Icons.Default.Clear, contentDescription = "Eliminar clase")
                                     }
                                 }
@@ -227,7 +236,7 @@ fun CrearMateriaScreen (
                     Icon(
                         imageVector = Icons.Default.Add, // Ícono de Material Design para "+"
                         contentDescription = "Agregar", // Descripción accesible
-                        tint = MaterialTheme.colorScheme.primary // Color del ícono
+                        tint = BlueGray // Color del ícono
                     )
                     Text(
                         text = "Agregar clase ",
@@ -278,6 +287,21 @@ fun CrearMateriaScreen (
                     showDialog = false
                     onBack()
                 }
+
+                if (showDeleteClaseDialog && currIndex >= 0) ConfirmDialog(
+                    title = "Confirmar eliminación",
+                    message = "¿Estás seguro de que deseas eliminar esta clase?",
+                    onConfirm = {
+                        horarioViewModel.deleteClase(currIndex)
+                        currIndex = -1
+                    },
+                    onDismiss = {
+                        showDeleteClaseDialog = false
+                        currIndex = -1
+                    },
+                    confirmButtonText = "Eliminar",
+                    dimissButtonText = "Cancelar"
+                )
 
 
                 if (showDeleteDialog) ConfirmDialog(

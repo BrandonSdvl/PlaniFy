@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.Color
 import com.mew.planify.data.local.AppDatabase
 import com.mew.planify.ui.screens.AppNavigation
 import com.mew.planify.ui.theme.PlaniFyTheme

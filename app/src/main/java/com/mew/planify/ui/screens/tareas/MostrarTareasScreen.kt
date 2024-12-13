@@ -2,6 +2,7 @@ package com.mew.planify.ui.screens.tareas
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,11 +13,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -38,18 +42,25 @@ import com.mew.planify.ui.viewmodel.TareaViewModel
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.mew.planify.R
 import com.mew.planify.data.local.entities.TareaEntity
 import com.mew.planify.ui.common.LoadingIndicator
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -70,26 +81,34 @@ fun MostrarTareasScreen(
     val tareas by viewModel.tareas.collectAsState()
     val loading by viewModel.loading.collectAsState()
 
-//    val tareasPendientes = tareas.filter { it.estatus == "Pendiente" && it.fechaEntrega?.toInstant()
-//        ?.atZone(
-//            ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) ?: false
-//    }
-    val tareasPendientes = remember(tareas) { tareas.filter { it.estatus == "Pendiente" && it.fechaEntrega?.toInstant()?.atZone(
-            ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) ?: false} }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarMessage = viewModel.snackbarMessage.collectAsState().value
+    val coroutineScope = rememberCoroutineScope()
 
-    val tareasCompletadas = tareas.filter { it.estatus == "Completada" }
-    val tareasVencidas = tareas.filter { it.fechaEntrega?.toInstant()
-        ?.atZone(
-            ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) ?: false }
+    val scrollState = rememberScrollState()
 
-    val pendienteExpanded = remember { mutableStateOf(true) }
-    val completadaExpanded = remember { mutableStateOf(true) }
-    val vencidaExpanded = remember { mutableStateOf(true) }
+    LaunchedEffect(snackbarMessage) {
+        snackbarMessage?.let {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(it)
+                viewModel.clearSnackbarMessage()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tareas") },
+                title = {  },
+                navigationIcon = {
+                    Image(
+                        painter = painterResource(id = if(isSystemInDarkTheme()) R.drawable.text_logo_dark else R.drawable.text_logo_light),
+                        contentDescription = "PlaniFy",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .padding(start = 16.dp)
+                    )
+                },
                 actions = {
                     IconButton(onClick = onCrearTareaClick) {
                         Icon(Icons.Default.Add, contentDescription = "Crear Tarea")
@@ -97,106 +116,125 @@ fun MostrarTareasScreen(
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
-            Column(
+            LazyColumn (
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
-//                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(padding)
             ) {
-                if(tareas.isEmpty() && !loading){
-                    Text(
-                        text = "No se ha registrado ninguna tarea",
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+                if (tareas.isEmpty() && !loading) {
+                    item {
+                        Text(
+                            text = "No se ha registrado ninguna tarea",
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
                 if (tareas.isNotEmpty()) {
-                    Text("Tareas pendientes",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth()
-                    )
+                    item {
+                        Text(
+                            "Tareas pendientes",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth()
+                        )
+                        HorizontalDivider()
+                    }
 
-                    HorizontalDivider()
+
                     if(!tareas.any() { it.estatus == "Pendiente" || it.estatus == "En progreso" }){
-                        Text(
-                            text = "No hay tareas pendientes",
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    LazyColumn {
-                            items(tareas.filter { it.estatus == "Pendiente" || it.estatus == "En progreso"}) { tarea ->
-                            TareaItem(
-                                tarea = tarea,
-                                onClick = { onTareaClick(tarea.id) },
-                                viewModel = viewModel,
+                        item {
+                            Text(
+                                text = "No hay tareas pendientes",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
 
-                    Text("Tareas Finalizadas ",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier
-                            .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-                            .fillMaxWidth()
-                    )
+                    items(tareas.filter { it.estatus == "Pendiente" || it.estatus == "En progreso"}) { tarea ->
+                        TareaItem(
+                            tarea = tarea,
+                            onClick = { onTareaClick(tarea.id) },
+                            viewModel = viewModel,
+                        )
+                    }
 
-                    HorizontalDivider()
+
+                    item {
+                        Text(
+                            "Tareas Finalizadas ",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier
+                                .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
+                                .fillMaxWidth()
+                        )
+
+                        HorizontalDivider()
+                    }
+
                     if(!tareas.any() { it.estatus == "Finalizada" }){
-                        Text(
-                            text = "No hay tareas finalizadas",
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    LazyColumn {
-                        items(tareas.filter { it.estatus == "Finalizada" }) { tarea ->
-                            TareaItem(
-                                tarea = tarea,
-                                onClick = { onTareaClick(tarea.id) },
-                                viewModel = viewModel,
+                        item {
+                            Text(
+                                text = "No hay tareas finalizadas",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
 
-                    Text("Tareas Vencidas",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier
-                            .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
-                            .fillMaxWidth()
-                    )
+                    items(tareas.filter { it.estatus == "Finalizada" }) { tarea ->
+                        TareaItem(
+                            tarea = tarea,
+                            onClick = { onTareaClick(tarea.id) },
+                            viewModel = viewModel,
+                        )
+                    }
 
-                    HorizontalDivider()
+
+                    item {
+                        Text(
+                            "Tareas Vencidas",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier
+                                .padding(top = 32.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
+                                .fillMaxWidth()
+                        )
+                        HorizontalDivider()
+                    }
+
+
                     if(!tareas.any() {
                             it.fechaEntrega?.toInstant()
                                 ?.atZone(
                                     ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) == true
                         }){
-                        Text(
-                            text = "No hay tareas vencidas",
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    LazyColumn {
-                        items(tareas.filter {it.fechaEntrega?.toInstant()
-                            ?.atZone(
-                                ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) ?: false}) {
-                                tarea ->
-                            TareaItem(tarea = tarea, onClick = { onTareaClick(tarea.id) }, viewModel = viewModel)
+                        item {
+                            Text(
+                                text = "No hay tareas vencidas",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
                         }
+                    }
+
+                    items(tareas.filter {it.fechaEntrega?.toInstant()
+                        ?.atZone(
+                            ZoneId.systemDefault())?.toLocalDate()?.isBefore(LocalDate.now()) ?: false}) {
+                            tarea ->
+                        TareaItem(tarea = tarea, onClick = { onTareaClick(tarea.id) }, viewModel = viewModel)
                     }
                 }
             }

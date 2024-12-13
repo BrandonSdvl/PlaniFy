@@ -2,23 +2,24 @@ package com.mew.planify.ui.screens.horario
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,15 +29,18 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.mew.planify.R
 import com.mew.planify.data.local.dao.HorarioInfo
+import com.mew.planify.ui.theme.primaryDark
+import com.mew.planify.ui.theme.primaryLight
 import com.mew.planify.ui.viewmodel.HorarioViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -63,10 +67,19 @@ fun HorarioScreen(
         materias.addAll(nuevosHorarios)
     }
 
+    val BlueGray = if(isSystemInDarkTheme()) primaryDark else primaryLight
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Horario") }
+                title = { },
+                navigationIcon = {
+                    Image(
+                        painter = painterResource(id = if(isSystemInDarkTheme()) R.drawable.text_logo_dark else R.drawable.text_logo_light),
+                        contentDescription = "PlaniFy",
+                        modifier = Modifier.size(120.dp).padding(start = 16.dp)
+                    )
+                }
             )
         },
         content = { padding ->
@@ -78,6 +91,20 @@ fun HorarioScreen(
                     .padding(4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, bottom = 24.dp, top = 8.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Horario",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
+                        )
+                    )
+                }
                 // Selector de días
                 Row(
                     modifier = Modifier
@@ -101,7 +128,7 @@ fun HorarioScreen(
                         currDay.value,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = BlueGray
                         )
                     )
 
@@ -154,7 +181,7 @@ fun HorarioScreen(
                                         )
                                     )
                                     Text(
-                                        materia.edificio,
+                                        if(materia.edificio =="") "N/A" else materia.edificio,
                                         Modifier.weight(1f),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -171,12 +198,12 @@ fun HorarioScreen(
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
-                                        materia.nombre_profesor,
+                                        text = if(materia.nombre_profesor != null) materia.nombre_profesor else "Sin asignar",
                                         Modifier.weight(3f),
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                     Text(
-                                        materia.salon,
+                                        if(materia.salon == "") "N/A" else materia.salon,
                                         Modifier.weight(1f),
                                         style = MaterialTheme.typography.bodyMedium
                                     )

@@ -15,7 +15,7 @@ interface TareaDao {
     @Delete
     suspend fun delete(tarea: TareaEntity)
 
-    @Query("SELECT * FROM tareas")
+    @Query("SELECT * FROM tareas ORDER BY fecha_entrega ASC")
     fun getAll(): Flow<List<TareaEntity>>
 
     @Query("SELECT * FROM tareas WHERE id = :id")

@@ -2,6 +2,8 @@ package com.mew.planify.ui.viewmodel
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mew.planify.data.local.dao.HorarioInfo
@@ -42,6 +44,8 @@ class HorarioViewModel(private val repository: HorarioRepository) : ViewModel() 
 
     private val _formState = MutableStateFlow<List<FormState>>(emptyList())
     val formState: StateFlow<List<FormState>> = _formState
+
+    val diasOptions = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes")
 
     init {
         getAll()
@@ -200,14 +204,14 @@ class HorarioViewModel(private val repository: HorarioRepository) : ViewModel() 
 
     private fun validateEdificio(edificio: String): String? {
         return when {
-            edificio.isBlank() -> "Ingrese un edificio"
+            edificio.length > 20 -> "El edificio no puede tener más de 20 caracteres"
             else -> null
         }
     }
 
     private fun validateSalon(salon: String): String? {
         return when {
-            salon.isBlank() -> "Ingrese un salon"
+            salon.length > 20 -> "El salón no puede tener más de 20 caracteres"
             else -> null
         }
     }

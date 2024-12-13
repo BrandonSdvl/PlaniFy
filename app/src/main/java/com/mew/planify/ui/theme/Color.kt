@@ -17,3 +17,6 @@ val Pink80 = Color(0xFF062A40)  // Azul intermedio-oscuro
 val Purple40 = Color(0xFF011640)  // Azul muy oscuro
 val PurpleGrey40 = Color(0xFF062540)  // Azul oscuro
 val Pink40 = Color(0xFF062540)  // Azul oscuro (similar al gris oscuro)
+
+val primaryLight = Color(0xFF4A6F9B) // Ajuste para tema claro
+val primaryDark = Color(0xFF8A5E3D)  // Ajuste para tema oscuro

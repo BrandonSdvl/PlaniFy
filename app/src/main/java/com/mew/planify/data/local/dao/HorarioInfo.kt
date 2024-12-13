@@ -10,5 +10,5 @@ data class HorarioInfo(
     val edificio: String,
     val salon: String,
     val nombre_materia: String,
-    val nombre_profesor: String
+    val nombre_profesor: String? = ""
 )

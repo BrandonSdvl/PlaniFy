@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
@@ -37,6 +38,9 @@ class TareaViewModel(
 
     private val _changed = MutableStateFlow(false)
     val changed: StateFlow<Boolean> = _changed
+
+    private val _snackbarMessage = MutableStateFlow<String?>(null)
+    val snackbarMessage = _snackbarMessage.asStateFlow()
 
     init {
         getAll()
@@ -80,10 +84,15 @@ class TareaViewModel(
                     _error.value = e.message
                 }
             }
+            _snackbarMessage.value = "Tarea guardada exitosamente"
             return true
         } else {
             return false
         }
+    }
+
+    fun clearSnackbarMessage() {
+        _snackbarMessage.value = null
     }
 
     fun delete(tareaId: Int) {
